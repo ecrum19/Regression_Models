@@ -38,7 +38,7 @@ data_Y<-data[17]
 #creates empty vectors to store mean RMSE values
 data_RMSE<-rep(NA,11)
 
-###Ridge, Lasso, EN
+###Ridge, Lasso, EN (Applied Methods)
 #for each value of alpha
 for(i in seq(0,0.7,0.1)){
   #empty vectors to store predicted Y values
@@ -102,7 +102,8 @@ colnames(compiled)<-c("Model","RMSE")
 compiled<-as.data.frame(compiled)
 compiled[,]<-sapply(compiled[,],as.numeric)
 
-###MARS
+
+###MARS (Original Analysis)
 #builds a model for each k 
 fit1<-earth(condition~.,trainset_1)
 fit2<-earth(condition~.,trainset_2)
