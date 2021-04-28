@@ -72,14 +72,14 @@ testset_5<-data[1689:2111,]
 data_Y<-data[17]
 #creates empty vectors to store mean RMSE values
 data_RMSE<-rep(NA,11)
-
+raw_RMSE <- matrix(, nrow=11, ncol=5)
 
 
 
 ###Ridge, Lasso, EN (Applied Methods)
 
 #for each value of alpha
-for(i in seq(0,0.7,0.1)){
+for(i in seq(0,1,0.1)){
   #empty vectors to store predicted Y values
   resultsdata<-rep(NA,nrow(rawfile))
   #empty vectors to store RMSE of each group k 
@@ -120,25 +120,23 @@ for(i in seq(0,0.7,0.1)){
   data_RMSE_tmp[3]<-RMSE(data_Y$alpha[845:1266],data_Y$condition[845:1266])
   data_RMSE_tmp[4]<-RMSE(data_Y$alpha[1267:1688],data_Y$condition[1267:1688])
   data_RMSE_tmp[5]<-RMSE(data_Y$alpha[1689:2111],data_Y$condition[1689:2111])
-  if (i==0){data_RMSE[1]<-mean(data_RMSE_tmp)}
-  else if (i==0.1){data_RMSE[2]<-mean(data_RMSE_tmp)}
-  else if (i==0.2){data_RMSE[3]<-mean(data_RMSE_tmp)}
-  else if (i==0.3){data_RMSE[4]<-mean(data_RMSE_tmp)}
-  else if (i==0.4){data_RMSE[5]<-mean(data_RMSE_tmp)}
-  else if (i==0.5){data_RMSE[6]<-mean(data_RMSE_tmp)}
-  else if (i==0.6){data_RMSE[7]<-mean(data_RMSE_tmp)}
-  else if (i==0.7){data_RMSE[8]<-mean(data_RMSE_tmp)}
-  else if (i==0.8){data_RMSE[9]<-mean(data_RMSE_tmp)}
-  else if (i==0.9){data_RMSE[10]<-mean(data_RMSE_tmp)}
-  else if (i==1){data_RMSE[11]<-mean(data_RMSE_tmp)}
+  
+  data_RMSE[(i*10)+1] <- mean(data_RMSE_tmp)
+  raw_RMSE[(i*10)+1,] <- data_RMSE_tmp
 }
+
+data_RMSE
+raw_RMSE
 
 #compiling results
 compiled<-matrix(data=NA,nrow=11,ncol=2)
 compiled[,1]<-seq(0,1,0.1)
 compiled[,2]<-data_RMSE
 colnames(compiled)<-c("Model","RMSE")
+rownames(raw_RMSE)<-c(seq(0,1,0.1))
+raw_RMSE<-as.data.frame(raw_RMSE)
 compiled<-as.data.frame(compiled)
+raw_RMSE[,]<-sapply(raw_RMSE[,],as.numeric)
 compiled[,]<-sapply(compiled[,],as.numeric)
 
 
@@ -180,6 +178,10 @@ marsdata_RMSE_tmp[4]<-RMSE(data_Y$mars[1267:1688],data_Y$condition[1267:1688])
 marsdata_RMSE_tmp[5]<-RMSE(data_Y$mars[1689:2111],data_Y$condition[1689:2111])
 mars.rmse<-as.data.frame(t(matrix(c("MARS",as.numeric(mean(marsdata_RMSE_tmp))))))
 colnames(mars.rmse)<-c("Model","RMSE")
+
+raw_RMSE<-rbind(raw_RMSE, marsdata_RMSE_tmp)
+rownames(raw_RMSE)[rownames(raw_RMSE) == '12'] <- 'MARS'
+
 compiled<-rbind(compiled,mars.rmse)
 compiled[,2]<-sapply(compiled[,2],as.numeric)
 
@@ -187,4 +189,10 @@ compiled[,2]<-sapply(compiled[,2],as.numeric)
 ggplot(compiled,aes(x=Model,y=RMSE))+geom_col()
 ggplot(compiled,aes(x=Model,y=RMSE))+geom_point(shape=19,color="blue",size=3)
 
+### final RMSE data
+# all RMSE data gathered
+raw_RMSE
+
+# average RMSE data for each model
+compiled
 
