@@ -188,7 +188,7 @@ compiled[,2]<-sapply(compiled[,2],as.numeric)
 ###making plots
 ggplot(compiled,aes(x=Model,y=RMSE))+geom_col()
 ggplot(compiled,aes(x=Model,y=RMSE, color=RMSE))+geom_point(shape=16,size=2)+theme_light() +
-  scale_color_gradientn(colours = rainbow(3)) + ggtitle('Regression Model RMSE Values')
+  scale_color_gradientn(colours = rainbow(3))
 ggsave('RMSE_results.png', device='png')
 
 ### final RMSE data
