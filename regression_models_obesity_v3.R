@@ -189,6 +189,7 @@ compiled<-rbind(compiled,mars.rmse)
 compiled[,2]<-sapply(compiled[,2],as.numeric)
 
 
+
 ### Multinomial Logistic Regression
 
 rawfile2 <- read.csv('/Users/eliascrum/Desktop/2021-Spring/STAT_437/Group Project/ObesityDataSet_char.csv')
@@ -239,39 +240,33 @@ log_prediction3<-predict(log_model3,log_testset_3[1:16])
 log_prediction4<-predict(log_model4,log_testset_4[1:16])
 log_prediction5<-predict(log_model5,log_testset_5[1:16])
 
-#creates empty vector to store results
-log_resultsdata<-rep(NA,nrow(rawfile2))
-log_resultsdata[1:422]<-log_prediction1
-log_resultsdata[423:844]<-log_prediction2
-log_resultsdata[845:1266]<-log_prediction3
-log_resultsdata[1267:1688]<-log_prediction4
-log_resultsdata[1689:2111]<-log_prediction5
 
-#appends results to dataframe containing true Y values
-data_Y$log<-log_resultsdata
+# miscalculation error
+log_miscalc <- rep(NA, 5)
+log_miscalc[1] <- mean(log_prediction1 != log_data$condition[1:422])
+log_miscalc[2] <- mean(log_prediction2 != log_data$condition[423:844])
+log_miscalc[3] <- mean(log_prediction3 != log_data$condition[845:1266])
+log_miscalc[4] <- mean(log_prediction4 != log_data$condition[1267:1688])
+log_miscalc[5] <- mean(log_prediction5 != log_data$condition[1689:2111])
 
-#computes RMSE
-log_data_RMSE_tmp<-rep(NA,5)
-log_data_RMSE_tmp[1]<-RMSE(data_Y$log[1:422],data_Y$condition[1:422])
-log_data_RMSE_tmp[2]<-RMSE(data_Y$log[423:844],data_Y$condition[423:844])
-log_data_RMSE_tmp[3]<-RMSE(data_Y$log[845:1266],data_Y$condition[845:1266])
-log_data_RMSE_tmp[4]<-RMSE(data_Y$log[1267:1688],data_Y$condition[1267:1688])
-log_data_RMSE_tmp[5]<-RMSE(data_Y$log[1689:2111],data_Y$condition[1689:2111])
-log.rmse<-as.data.frame(t(matrix(c("LOG",as.numeric(mean(log_data_RMSE_tmp))))))
-colnames(log.rmse)<-c("Model","RMSE")
 
-raw_RMSE<-rbind(raw_RMSE, log_data_RMSE_tmp)
-rownames(raw_RMSE)[rownames(raw_RMSE) == '13'] <- 'LOG'
+log_fig <- rep(NA, nrow(log_data))
+log_fig[1:422] <- (log_prediction1 == log_data$condition[1:422])
+log_fig[423:844] <- (log_prediction2 == log_data$condition[423:844])
+log_fig[845:1266] <- (log_prediction3 == log_data$condition[845:1266])
+log_fig[1267:1688] <- (log_prediction4 == log_data$condition[1267:1688])
+log_fig[1689:2111] <- (log_prediction5 == log_data$condition[1689:2111])
+log_fig <- sapply(log_fig, as.numeric)
 
-compiled<-rbind(compiled,log.rmse)
-compiled[,2]<-sapply(compiled[,2],as.numeric)
+hist(log_fig,xlab='Accuracy',ylab='Freq',main='Logistic Regression Accuracy', 
+     col='cyan',border='blue',density=30)
 
 
 ###making plots
 ggplot(compiled,aes(x=Model,y=RMSE))+geom_col()
 ggplot(compiled,aes(x=Model,y=RMSE, color=RMSE))+geom_point(shape=16,size=2)+theme_light() +
   scale_color_gradientn(colours = rainbow(3))
-ggsave('RMSE_results.png', device='png')
+ggsave('RMSE_all_results.png', device='png')
 
 ### final RMSE data
 # all RMSE data gathered
@@ -279,4 +274,8 @@ raw_RMSE
 
 # average RMSE data for each model
 compiled
+
+### Final Logistic Accuracy
+1-log_miscalc
+1 - mean(log_miscalc)
 
