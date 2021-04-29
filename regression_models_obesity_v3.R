@@ -3,9 +3,10 @@ library(glmnet)
 library(MLmetrics)
 library(ggplot2)
 library(earth)
+library(nnet)
 
 # Fixes input dataset to contain only numeric values
-data <- read.csv(infile)
+data <- read.csv('/Users/eliascrum/Desktop/2021-Spring/STAT_437/Group Project/ObesityDataSet_raw_and_data_sinthetic.csv')
   
 mapping0 <- c('yes' = 1, 'no' = 0)
 data$hist <- mapping0[data$family_history_with_overweight]
@@ -31,6 +32,8 @@ mapping3 <- c('Automobile'=0, 'Motorbike'=1, 'Bike'=2, 'Public_Transportation'=3
 data$mtrans <- mapping3[data$MTRANS]
 data$MTRANS <- NULL
   
+write.csv(data, 'ObesityDataSet_char.csv', row.names = FALSE)
+
 mapping4 <- c('Insufficient_Weight'=0,'Normal_Weight'=1,'Overweight_Level_I'=2,'Overweight_Level_II'=3,
                 'Obesity_Type_I'=4,'Obesity_Type_II'=5,'Obesity_Type_III'=6)
 data$condition <- mapping4[data$NObeyesdad]
@@ -40,7 +43,7 @@ write.csv(data, 'ObesityDataSet_numeric.csv', row.names = FALSE)
 
 
 #reading file
-rawfile<-read.csv("ObesityDataSet_numeric.csv")
+rawfile<-read.csv("/Users/eliascrum/Desktop/2021-Spring/STAT_437/Group Project/ObesityDataSet_numeric.csv")
 
 #shuffling data frames
 data<-rawfile[sample(nrow(rawfile)),]
@@ -76,7 +79,7 @@ raw_RMSE <- matrix(, nrow=11, ncol=5)
 
 
 
-###Ridge, Lasso, EN (Applied Methods)
+### Ridge, Lasso, EN (Applied Methods)
 
 #for each value of alpha
 for(i in seq(0,1,0.1)){
@@ -142,7 +145,7 @@ compiled[,]<-sapply(compiled[,],as.numeric)
 
 
 
-###MARS (Original Analysis)
+### MARS (Original Analysis)
 
 #builds a model for each k 
 fit1<-earth(condition~.,trainset_1)
@@ -184,6 +187,85 @@ rownames(raw_RMSE)[rownames(raw_RMSE) == '12'] <- 'MARS'
 
 compiled<-rbind(compiled,mars.rmse)
 compiled[,2]<-sapply(compiled[,2],as.numeric)
+
+
+### Multinomial Logistic Regression
+
+rawfile2 <- read.csv('/Users/eliascrum/Desktop/2021-Spring/STAT_437/Group Project/ObesityDataSet_char.csv')
+cols<-c(1:16)
+rawfile2[cols]<-sapply(rawfile2[cols], as.numeric)
+
+#shuffling data frames
+log_data<-rawfile2[sample(nrow(rawfile2)),]
+
+#splitting into five sets of training/testing files
+#1
+log_trainset_1<-log_data[423:nrow(log_data),]
+log_testset_1<-log_data[1:422,]
+#2
+log_trainset_2<-log_data[1:422,]
+log_trainset_2_tmp<-log_data[845:nrow(log_data),]
+log_trainset_2<-rbind(log_trainset_2,log_trainset_2_tmp)
+log_testset_2<-log_data[423:844,]
+#3
+log_trainset_3<-log_data[1:844,]
+log_trainset_3_tmp<-data[1267:nrow(log_data),]
+log_trainset_3<-rbind(log_trainset_3,log_trainset_3_tmp)
+log_testset_3<-log_data[845:1266,]
+#4
+log_trainset_4<-log_data[1:1266,]
+log_trainset_4_tmp<-log_data[1689:nrow(log_data),]
+log_trainset_4<-rbind(log_trainset_4,log_trainset_4_tmp)
+log_testset_4<-log_data[1267:1688,]
+#5
+log_trainset_5<-log_data[1:1688,]
+log_testset_5<-log_data[1689:2111,]
+
+#creates empty vectors to store mean RMSE values
+log_data_RMSE<-rep(NA,11)
+log_raw_RMSE <- matrix(, nrow=11, ncol=5)
+
+#builds a model for each k 
+log_model1<-multinom(condition~.,log_trainset_1)
+log_model2<-multinom(condition~.,log_trainset_2)
+log_model3<-multinom(condition~.,log_trainset_3)
+log_model4<-multinom(condition~.,log_trainset_4)
+log_model5<-multinom(condition~.,log_trainset_5)
+
+#predicts using each model
+log_prediction1<-predict(log_model1,log_testset_1[1:16])
+log_prediction2<-predict(log_model2,log_testset_2[1:16])
+log_prediction3<-predict(log_model3,log_testset_3[1:16])
+log_prediction4<-predict(log_model4,log_testset_4[1:16])
+log_prediction5<-predict(log_model5,log_testset_5[1:16])
+
+#creates empty vector to store results
+log_resultsdata<-rep(NA,nrow(rawfile2))
+log_resultsdata[1:422]<-log_prediction1
+log_resultsdata[423:844]<-log_prediction2
+log_resultsdata[845:1266]<-log_prediction3
+log_resultsdata[1267:1688]<-log_prediction4
+log_resultsdata[1689:2111]<-log_prediction5
+
+#appends results to dataframe containing true Y values
+data_Y$log<-log_resultsdata
+
+#computes RMSE
+log_data_RMSE_tmp<-rep(NA,5)
+log_data_RMSE_tmp[1]<-RMSE(data_Y$log[1:422],data_Y$condition[1:422])
+log_data_RMSE_tmp[2]<-RMSE(data_Y$log[423:844],data_Y$condition[423:844])
+log_data_RMSE_tmp[3]<-RMSE(data_Y$log[845:1266],data_Y$condition[845:1266])
+log_data_RMSE_tmp[4]<-RMSE(data_Y$log[1267:1688],data_Y$condition[1267:1688])
+log_data_RMSE_tmp[5]<-RMSE(data_Y$log[1689:2111],data_Y$condition[1689:2111])
+log.rmse<-as.data.frame(t(matrix(c("LOG",as.numeric(mean(log_data_RMSE_tmp))))))
+colnames(log.rmse)<-c("Model","RMSE")
+
+raw_RMSE<-rbind(raw_RMSE, log_data_RMSE_tmp)
+rownames(raw_RMSE)[rownames(raw_RMSE) == '13'] <- 'LOG'
+
+compiled<-rbind(compiled,log.rmse)
+compiled[,2]<-sapply(compiled[,2],as.numeric)
+
 
 ###making plots
 ggplot(compiled,aes(x=Model,y=RMSE))+geom_col()
