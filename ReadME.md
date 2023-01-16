@@ -1,6 +1,6 @@
-Project Guidelines detailed in "Project Guidelines.pdf"
-<br>
-Write-up found in "Write-up.pdf"
+**Project Guidelines detailed in "Project Guidelines.pdf"**
+<br><br>
+**Write-up found in "Write-up.pdf"**
 <br>
 <br>
 <br>
