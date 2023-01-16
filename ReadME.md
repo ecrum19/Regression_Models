@@ -1,9 +1,9 @@
 Project Guidelines detailed in "Project Guidelines.pdf"
-
+<br>
 Write-up found in "Write-up.pdf"
-
-
-
+<br>
+<br>
+<br>
 Data Attribute Changes Guide:
 
 Old_tag (New_tag) : Change_in_value
