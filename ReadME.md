@@ -4,7 +4,7 @@
 <br>
 <br>
 <br>
-Data Attribute Changes Guide:<br>
+**Data Attribute Changes Guide:**<br>
 <br>
 Old_tag (New_tag) : Change_in_value<br>
 <br>
