@@ -1,6 +1,4 @@
-Project Guidelines:
-
-https://sakai.luc.edu/access/content/group/STAT_337_001_1680_1212/Lessons/Project/Project%20Guidelines.pdf
+Project Guidelines detailed in Project_Guidelines.pdf
 
 
 Write-up:
