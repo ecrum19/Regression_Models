@@ -1,9 +1,6 @@
 Project Guidelines detailed in "Project Guidelines.pdf"
 
-
-Write-up:
-
-https://loyolauniversitychicago-my.sharepoint.com/:w:/g/personal/ecrum_luc_edu/EdlZZvcl8QlOs8-eS3e1aeYBH7G9_Ds_aQ-COPAJO16jng?e=KRCXij
+Write-up found in "Write-up.pdf"
 
 
 
