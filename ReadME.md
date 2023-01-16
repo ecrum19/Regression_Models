@@ -1,4 +1,4 @@
-Project Guidelines detailed in Project_Guidelines.pdf
+Project Guidelines detailed in "Project Guidelines.pdf"
 
 
 Write-up:
